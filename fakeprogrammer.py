@@ -1,7 +1,7 @@
 """ a test script to emulate a BF-C50 programmer"""
 import serial
 
-SERIAL_PORT = "/dev/tty.usbserial-10"
+SERIAL_PORT = "/dev/tty.usbserial-110"
 
 ### DATA SENT BY COMPUTER ###
 
@@ -14,6 +14,9 @@ ACK = bytes.fromhex("02")
 ### DATA SENT BY RADIO ###
 # expected response to initial program request
 R_INIT_RESP = bytes.fromhex("57 03 30 08 1F 03 FF FF FF FF FF FF")
+R_READ_RESP = bytes.fromhex(
+    "574502501f03ffffffffffffffff010100850100496201007c0100804562500100800008019d8392021a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0a23ff87e527182d3b230003"
+)
 
 
 def send_read_init():
@@ -29,6 +32,16 @@ def check_init_resp(received_data):
         return True
 
     print("Received bad init data (radio to computer): %s", received_data.hex())
+    return False
+
+
+def check_read_resp(read_resp):
+    """check the response to the read request"""
+    if read_resp == R_READ_RESP:
+        print("Received expected response (radio to computer): ", read_resp.hex())
+        return True
+
+    print("Received bad read data (radio to computer): %s", read_resp.hex())
     return False
 
 
@@ -52,17 +65,22 @@ if __name__ == "__main__":
 
         while True:
 
-            print("Waiting for data from radio...")
+            # print("Waiting for data from radio...")
             # Read data from the serial port in chunks of 4 bytes
             chunk = ser.read(1)
-            print("Received data (radio to computer):", chunk.hex())
+            # print("Received data (radio to computer):", chunk.hex())
 
             # Concatenate the received chunk
             received_data += chunk
+
+            if len(received_data) == 84:
+                check_read_resp(received_data)
 
     except KeyboardInterrupt:
         print("Exiting tester program.")
     except Exception as e:
         print(f"An error occurred: {str(e)}")
     finally:
+        print("Received final data: ", received_data.hex())
+        print("Total length of received data:", len(received_data))
         ser.close()
