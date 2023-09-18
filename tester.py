@@ -9,8 +9,6 @@ SERIAL_PORT = "/dev/tty.usbserial-10"
 C_READ_INIT = bytes.fromhex("FE 03 30 08")
 # download request?
 C_DL_REQ = bytes.fromhex("45 02 50 52 4F 47 52 41 4C")
-# ACK
-ACK = bytes.fromhex("06")  # ACK byte (sent by computer)
 
 ### DATA SENT BY RADIO ###
 # expected response to initial program request
