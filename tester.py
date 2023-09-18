@@ -57,19 +57,6 @@ if __name__ == "__main__":
             # Concatenate the received chunk
             received_data += chunk
 
-            # Check if the first 3 received chunks match R_INIT_RESP
-            if len(received_data) == len(R_INIT_RESP):
-                if received_data == R_INIT_RESP and not INIT_RESP_RVCD:
-                    print(
-                        "Received expected response (radio to computer): ",
-                        received_data.hex(),
-                    )
-
-                else:
-                    print("Received data (radio to computer): %s", received_data.hex())
-
-                received_data = b""
-
     except KeyboardInterrupt:
         print("Exiting tester program.")
     except Exception as e:
