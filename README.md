@@ -13,5 +13,6 @@ test scripts to discover the bfc50 clone process and memory layout
 ### Cloned Data
 1) Assumed to be the 71 bytes received after the first transaction
 2) A "blank" config with the default settings and no memories returns: `574502501f03ffffffffffffff00010100850100496201007c0100804562500100800008010ec7d2001a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182338230003`
-3) Update that config, changing the toogling the "beep" setting and it returns:
-`574502501f03ffffffffffffff00010100850100496201007c0100804562500100800008010ec7d2001a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182338230003`
+3) Update that config, changing the first channel to 446.000 and it returns:
+`574502501f03ffffffffffffffff010100850100496201007c0100804562500100800008010ec7d2021a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182838230003`
+
