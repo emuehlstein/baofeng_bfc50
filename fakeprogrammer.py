@@ -1,7 +1,7 @@
 """ a test script to emulate a BF-C50 programmer"""
 import serial
 
-SERIAL_PORT = "/dev/tty.usbserial-110"
+SERIAL_PORT = "/dev/tty.usbserial-10"
 
 ### DATA SENT BY COMPUTER ###
 
@@ -15,7 +15,10 @@ ACK = bytes.fromhex("02")
 # expected response to initial program request
 R_INIT_RESP = bytes.fromhex("57 03 30 08 1F 03 FF FF FF FF FF FF")
 R_READ_RESP = bytes.fromhex(
-    "574502501f03ffffffffffffffff010100850100496201007c0100804562500100800008019d8392021a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0a23ff87e527182d3b230003"
+    "574502501f03ffffffffffffff00010100850100496201007c0100804562500100800008010ec7d2001a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182338230003"
+)  # a blank default config
+R_READ_RESP_WBEEP = bytes.fromhex(
+    "574502501f03ffffffffffffff80010100850100496201007c0100804562500100800008750ec7d2021a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182338230003"
 )
 
 
@@ -41,7 +44,7 @@ def check_read_resp(read_resp):
         print("Received expected response (radio to computer): ", read_resp.hex())
         return True
 
-    print("Received bad read data (radio to computer): %s", read_resp.hex())
+    print("Received bad read data (radio to computer): ", read_resp.hex())
     return False
 
 
