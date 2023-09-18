@@ -9,6 +9,7 @@ SERIAL_PORT = "/dev/tty.usbserial-10"
 C_READ_INIT = bytes.fromhex("FE 03 30 08")
 # download request?
 C_DL_REQ = bytes.fromhex("45 02 50 52 4F 47 52 41 4C")
+ACK = bytes.fromhex("02")
 
 ### DATA SENT BY RADIO ###
 # expected response to initial program request
@@ -41,6 +42,10 @@ if __name__ == "__main__":
         received_data = b""  # Initialize an empty byte string for concatenation
         init_resp = ser.read(12)  # read 12 bytes (len of R_INIT_RESP)
         if check_init_resp(init_resp):
+            # send ACK
+            ser.write(ACK)
+            print("Sent ACK data (computer to radio):", ACK.hex())
+
             # send download request?
             ser.write(C_DL_REQ)
             print("Sent C_DL_REQ data (computer to radio):", C_DL_REQ.hex())
