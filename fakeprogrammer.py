@@ -15,6 +15,9 @@ ACK = bytes.fromhex("02")
 # expected response to initial program request
 R_INIT_RESP = bytes.fromhex("57 03 30 08 1F 03 FF FF FF FF FF FF")
 R_READ_RESP = bytes.fromhex(
+    "574502501f03ffffffffffff0000020100850200496201007c0100804562500100800008010ec7d2021a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182838020003"
+)  # working config
+R_READ_RESP_BLANK = bytes.fromhex(
     "574502501f03ffffffffffffff00010100850100496201007c0100804562500100800008010ec7d2001a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182338230003"
 )  # a blank default config
 R_READ_RESP_WBEEP = bytes.fromhex(
@@ -49,7 +52,6 @@ def check_read_resp(read_resp):
 
 
 if __name__ == "__main__":
-
     # Setup serial port
     ser = serial.Serial(SERIAL_PORT, baudrate=9600)
 
@@ -66,8 +68,23 @@ if __name__ == "__main__":
             ser.write(C_DL_REQ)
             print("Sent C_DL_REQ data (computer to radio):", C_DL_REQ.hex())
 
-        while True:
+        # read 84 bytes (len of R_READ_RESP)
+        resp = ser.read(84)
+        if check_read_resp(resp):
+            # send ACK
+            ser.write(bytes.fromhex("45"))
+            print("Sent 45 (computer to radio):", 45)
 
+        resp = ser.read(1)
+        if resp == bytes.fromhex("46"):
+            print("Received 46 (radio to computer):", resp.hex())
+            # send ACK
+            ser.write(bytes.fromhex(ACK.hex()))
+            print("Sent ACK (computer to radio):", ACK.hex())
+        else:
+            print("Received bad ACK (radio to computer):", resp.hex())
+
+        while True:
             # print("Waiting for data from radio...")
             # Read data from the serial port in chunks of 4 bytes
             chunk = ser.read(1)
@@ -75,10 +92,6 @@ if __name__ == "__main__":
 
             # Concatenate the received chunk
             received_data += chunk
-
-            if len(received_data) == 84:
-                if check_read_resp(received_data):
-                    ser.write(bytes.fromhex("45"))
 
     except KeyboardInterrupt:
         print("Exiting tester program.")

@@ -36,7 +36,6 @@ def send_read_resp(read_resp):
 if __name__ == "__main__":
     # Setup serial port
     ser = serial.Serial(SERIAL_PORT, baudrate=9600)
-    
 
     try:
         received_data = b""  # Initialize an empty byte string for concatenation
@@ -51,10 +50,10 @@ if __name__ == "__main__":
                 received_data = b""
                 # Send the response to the initial program request
                 send_init_resp()
-   
+
             elif received_data == C_DL_REQ:
                 print("Received C_DL_REQ data (computer to radio):", chunk.hex())
-                # You can handle the download request if needed
+                send_read_resp(R_READ_RESP)
             else:
                 print("Received unexpected data (computer to radio):", chunk.hex())
 
