@@ -45,17 +45,24 @@ if __name__ == "__main__":
             received_data += chunk
 
             if received_data == C_READ_INIT:
-                print("Received C_READ_INIT data (computer to radio):", chunk.hex())
+                print("Received C_READ_INIT data (computer to radio):", received_data.hex())
                 # clear the buffer
                 received_data = b""
                 # Send the response to the initial program request
                 send_init_resp()
 
-            elif received_data == C_DL_REQ:
-                print("Received C_DL_REQ data (computer to radio):", chunk.hex())
+            if received_data == C_DL_REQ:
+                print("Received C_DL_REQ data (computer to radio):", received_data.hex())
+                # clear the buffer
+                received_data = b""
                 send_read_resp(R_READ_RESP)
+            
+            if received_data == bytes.fromhex("45"):
+                print("Received 45")
+                ser.write(bytes.fromhex("46"))
+            
             else:
-                print("Received unexpected data (computer to radio):", chunk.hex())
+                print("Received unexpected data (computer to radio):", received_data)
 
     except KeyboardInterrupt:
         print("Exiting fakeradio program.")
