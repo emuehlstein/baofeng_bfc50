@@ -77,7 +77,8 @@ if __name__ == "__main__":
             received_data += chunk
 
             if len(received_data) == 84:
-                check_read_resp(received_data)
+                if check_read_resp(received_data):
+                    ser.write(bytes.fromhex("45"))
 
     except KeyboardInterrupt:
         print("Exiting tester program.")
