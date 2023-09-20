@@ -1,39 +1,59 @@
 import serial
 
-# Define the expected c_read_init data (sent by computer) and ACK byte using .fromhex()
-c_read_init = bytes.fromhex("FE 03 30 08")  # Expected data sent by computer
-ack = bytes.fromhex("06")  # ACK byte (sent by radio to acknowledge)
+SERIAL_PORT = "/dev/tty.usbserial-10"
 
-# Define the response r_init_resp data (sent by radio) using .fromhex()
-r_init_resp = bytes.fromhex("57 03 30 08 1F 03 FF FF FF FF FF FF")
+### DATA SENT BY COMPUTER ###
 
-# Serial port settings
-ser = serial.Serial('/dev/tty.usbserial-10', baudrate=9600)
+# initial request sent by computer
+C_READ_INIT = bytes.fromhex("FE 03 30 08")
+# download request?
+C_DL_REQ = bytes.fromhex("45 02 50 52 4F 47 52 41 4C")
+ACK = bytes.fromhex("02")
 
-try:
-    while True:
-        # Wait for the c_read_init data and print it in hex
-        received_data = ser.read(len(c_read_init))
-        print("Received data (computer to radio):", received_data.hex())
+### DATA SENT BY RADIO ###
+# expected response to initial program request
+R_INIT_RESP = bytes.fromhex("57 03 30 08 1F 03 FF FF FF FF FF FF")
+R_READ_RESP = bytes.fromhex(
+    "574502501f03ffffffffffffff00010100850100496201007c0100804562500100800008010ec7d2001a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182338230003"
+)  # a blank default config
+R_READ_RESP_WBEEP = bytes.fromhex(
+    "574502501f03ffffffffffffff80010100850100496201007c0100804562500100800008750ec7d2021a28080e002c002cff01ffff403e353254523e3c272653510d0f0b0eff19dd0b23ff87e527182338230003"
+)
 
-        if received_data == c_read_init:
-            print("Received c_read_init data (computer to radio).")
-            
-            # Send the r_init_resp data (radio to computer)
-            ser.write(r_init_resp)
-            print("Sent r_init_resp data (radio to computer):", r_init_resp.hex())
-            
-            # Wait for the ACK from the computer
-            ack_data = ser.read(len(ack))
-            print("Received ACK (computer to radio):", ack_data.hex())
-        else:
-            print("Received unexpected data (computer to radio).")
-        
-        # Continue listening for more data
-except KeyboardInterrupt:
-    print("Exiting program.")
-except Exception as e:
-    print(f"An error occurred: {str(e)}")
-finally:
-    ser.close()
 
+def send_init_resp():
+    """Send the response to the initial program request to the computer"""
+    ser.write(R_INIT_RESP)
+    print("Sent R_INIT_RESP data (radio to computer):", R_INIT_RESP.hex())
+
+
+def send_read_resp(read_resp):
+    """Send the response to the read request to the computer"""
+    ser.write(read_resp)
+    print("Sent R_READ_RESP data (radio to computer):", read_resp.hex())
+
+
+if __name__ == "__main__":
+    # Setup serial port
+    ser = serial.Serial(SERIAL_PORT, baudrate=9600)
+
+    try:
+        while True:
+            # Read data from the serial port in chunks of 4 bytes
+            chunk = ser.read(4)
+            if chunk == C_READ_INIT:
+                print("Received C_READ_INIT data (computer to radio):", chunk.hex())
+                # Send the response to the initial program request
+                send_init_resp()
+            elif chunk == C_DL_REQ:
+                print("Received C_DL_REQ data (computer to radio):", chunk.hex())
+                # You can handle the download request if needed
+            else:
+                print("Received unexpected data (computer to radio):", chunk.hex())
+
+    except KeyboardInterrupt:
+        print("Exiting fakeradio program.")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        ser.close()
