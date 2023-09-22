@@ -2,6 +2,12 @@
 
 test scripts to discover the bfc50 clone process and memory layout
 
+UPDATE: based on comparing byte strings received from the radio I believe
+that its operation is similar to several other chinese radios, notibly the
+it uses the bytestring b"PROGRAL" (similar to the b"PROGRAM" used by others)
+It also includes the bytestring b"P3107" which is found in the Chirp drivers
+for the Retevis H777, the HG_UV98 and the radtel_t18, and tdxone_tdq8a.py
+
 ## Observations
 
 ### Clone Read
